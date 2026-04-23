@@ -3,73 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mekyaner | Boutique</title>
+    <title>Mekyaner | Boutique Officielle</title>
     
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
     <style>
-        :root { --primary: #0288d1; --wa: #25D366; --bg: #f4fbff; }
-        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); }
+        :root { --primary: #0288d1; --dark: #1a1a1a; --accent: #ffd700; }
+        body { font-family: 'Poppins', sans-serif; margin: 0; background: #f8f9fa; color: var(--dark); padding-bottom: 60px; }
         
-        /* ENTÊTE AVEC LOGO EN HAUT */
+        /* HEADER AVEC LOGO */
         header { 
             background: var(--primary); 
-            color: #fff; 
-            padding: 25px 15px; 
+            color: white; 
+            padding: 30px 15px; 
             text-align: center; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15); 
         }
-        .logo-header {
-            max-width: 300px; /* Ajuste la taille ici */
-            height: auto;
+        .logo-container img {
+            width: 300px; /* Ajuste la taille de ton logo ici */
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid white;
+            background: white;
             margin-bottom: 10px;
-            display: block;
-            margin-left: auto;
-            margin-right: auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
-        header strong { font-size: 1.5rem; letter-spacing: 2px; display: block; }
-        header p { margin: 5px 0 0; font-size: 0.85rem; opacity: 0.9; }
+        .brand-name { font-size: 26px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; margin: 5px 0; }
+        .slogan { font-size: 13px; opacity: 0.9; font-style: italic; }
 
-        .container { max-width: 1000px; margin: 20px auto; padding: 0 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        /* GRILLE DE PRODUITS */
+        .container { max-width: 1100px; margin: auto; padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        @media (max-width: 480px) { .container { grid-template-columns: 1fr 1fr; gap: 10px; } }
+
+        .product-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid #eee; }
+        .product-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; }
+        .product-info { padding: 12px; text-align: center; }
+        .product-name { font-size: 14px; font-weight: 600; margin: 5px 0; height: 35px; overflow: hidden; }
+        .product-price { color: var(--primary); font-weight: 800; font-size: 17px; margin-bottom: 10px; }
         
-        /* Cartes Produits */
-        .prod-card { background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #eee; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .prod-card img { width: 100%; height: 200px; object-fit: cover; }
-        .btn-wa { background: var(--wa); color: white; padding: 12px; border: none; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-buy { background: var(--primary); color: white; border: none; width: 100%; padding: 12px; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-buy:active { transform: scale(0.95); }
 
-        /* Modal */
-        #modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:2000; align-items:center; justify-content:center; }
-        .modal-content { background:white; padding:25px; border-radius:15px; width:90%; max-width:400px; }
-        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        /* MODAL COMMANDE */
+        #orderModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-content { background: white; padding: 30px; border-radius: 20px; width: 85%; max-width: 380px; text-align: center; }
+        .modal-content input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #eee; border-radius: 12px; font-size: 16px; outline: none; }
+        .modal-content input:focus { border-color: var(--primary); }
     </style>
 </head>
 <body>
 
 <header>
-    <img src="https://i.ibb.co/CxcghLq/Background-Eraser-20250525-183236550.png" alt="Logo" class="logo-header" onerror="this.style.display='none'">
-    <strong>MEKYANER</strong>
-    <p>Meilleure plateforme de vente en ligne au Tchad</p>
+    <div class="logo-container">
+        <img src="https://i.ibb.co/CxcghLq/Background-Eraser-20250525-183236550.png" alt="Logo Mekyaner">
+    </div>
+    <div class="brand-name">MEKYANER</div>
+    <div class="slogan">Meilleure plate-forme de vente en ligne au Tchad</div>
 </header>
 
-<div class="container">
-    <div id="productsGrid" class="grid"></div>
-</div>
+<div class="container" id="productGrid">
+    </div>
 
-<div id="modal">
+<div id="orderModal">
     <div class="modal-content">
-        <h3>Commander l'article</h3>
-        <p id="orderDetail" style="color:var(--primary); font-weight:bold;"></p>
-        <input type="text" id="clientName" placeholder="Votre Nom complet">
-        <input type="text" id="clientCity" placeholder="Votre Ville">
-        <input type="tel" id="clientPhone" placeholder="Votre Téléphone">
-        <button class="btn-wa" onclick="confirmOrder()">Confirmer sur WhatsApp</button>
-        <button onclick="closeModal()" style="background:none; border:none; width:100%; margin-top:10px; color:#666; cursor:pointer;">Annuler</button>
+        <h3 id="modalTitle" style="margin-bottom:5px;">Article</h3>
+        <p id="modalPrice" style="font-size:20px; font-weight:bold; color:var(--primary); margin-top:0;"></p>
+        <input type="text" id="custName" placeholder="Ton Nom Complet">
+        <input type="tel" id="custPhone" placeholder="Ton Numéro WhatsApp">
+        <button class="btn-buy" onclick="confirmOrder()" style="margin-top:15px; font-size:16px;">🔥 Commander maintenant</button>
+        <button onclick="closeModal()" style="background:none; border:none; color:#999; margin-top:15px; cursor:pointer;">Fermer</button>
     </div>
 </div>
 
 <script>
+// TA CONFIGURATION FIREBASE
 const firebaseConfig = {
     apiKey: "AIzaSyD5s2cQ68QqoG7vbPGW0lo_M0htpBF12FM",
     authDomain: "mekyaner-ad755.firebaseapp.com",
@@ -81,52 +93,59 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-const WHATSAPP_NUMBER = "23586752575"; 
-let selectedItem = null;
+let selectedProduct = null;
 
-function openModal(name, price) {
-    selectedItem = { name, price };
-    document.getElementById('orderDetail').innerText = `${name} - ${price} FCFA`;
-    document.getElementById('modal').style.display = 'flex';
-}
-function closeModal() { document.getElementById('modal').style.display = 'none'; }
-
-async function confirmOrder() {
-    const cName = document.getElementById('clientName').value;
-    const cCity = document.getElementById('clientCity').value;
-    const cPhone = document.getElementById('clientPhone').value;
-    if(!cName || !cCity || !cPhone) return alert("Remplissez tout !");
-    
-    await db.collection("orders").add({ 
-        product: selectedItem.name, 
-        amount: selectedItem.price, 
-        client: cName, 
-        city: cCity,
-        phone: cPhone, 
-        date: firebase.firestore.FieldValue.serverTimestamp() 
-    });
-
-    const text = `*COMMANDE MEKYANER*%0A📦 *Article :* ${selectedItem.name}%0A💰 *Prix :* ${selectedItem.price} FCFA%0A👤 *Client :* ${cName}%0A📍 *Ville :* ${cCity}%0A📞 *Tel :* ${cPhone}`;
-    window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${text}`, '_blank');
-    closeModal();
-}
-
+// CHARGEMENT DES PRODUITS
 db.collection("products").orderBy("createdAt", "desc").onSnapshot(snap => {
-    const grid = document.getElementById('productsGrid');
+    const grid = document.getElementById('productGrid');
     grid.innerHTML = '';
     snap.forEach(doc => {
         const p = doc.data();
         grid.innerHTML += `
-            <div class="prod-card">
-                <img src="${p.img}" onerror="this.src='https://via.placeholder.com/300x200'">
-                <div style="padding:15px">
-                    <strong>${p.name}</strong><br>
-                    <span style="color:var(--primary); font-weight:bold">${p.price.toLocaleString()} FCFA</span>
-                    <button class="btn-wa" onclick="openModal('${p.name.replace(/'/g, "\\'")}', ${p.price})">Commander</button>
-                </div>
-            </div>`;
+        <div class="product-card">
+            <img src="${p.img}" class="product-img" alt="${p.name}">
+            <div class="product-info">
+                <p class="product-name">${p.name}</p>
+                <p class="product-price">${p.price.toLocaleString()} F</p>
+                <button class="btn-buy" onclick="openOrderModal('${p.name}', ${p.price})">Acheter</button>
+            </div>
+        </div>`;
     });
 });
+
+function openOrderModal(name, price) {
+    selectedProduct = { name, price };
+    document.getElementById('modalTitle').innerText = name;
+    document.getElementById('modalPrice').innerText = price.toLocaleString() + " FCFA";
+    document.getElementById('orderModal').style.display = 'flex';
+}
+
+function closeModal() { document.getElementById('orderModal').style.display = 'none'; }
+
+async function confirmOrder() {
+    const name = document.getElementById('custName').value;
+    const phone = document.getElementById('custPhone').value;
+
+    if(!name || !phone) { alert("Remplis tes infos pour la livraison !"); return; }
+
+    try {
+        await db.collection("orders").add({
+            customerName: name,
+            customerPhone: phone,
+            productName: selectedProduct.name,
+            totalPrice: selectedProduct.price,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // REMPLACE LE NUMÉRO CI-DESSOUS PAR LE TIEN (Format: 235XXXXXXXX)
+        const monNumero = "23586752575"; 
+        const texte = `Salut MEKYANER ! Moi c'est ${name}. Je viens de commander : ${selectedProduct.name} (${selectedProduct.price} FCFA). Contactez-moi au ${phone}.`;
+        const waUrl = `https://wa.me/${monNumero}?text=${encodeURIComponent(texte)}`;
+
+        alert("Super ! Commande reçue. Redirection vers WhatsApp...");
+        window.location.href = waUrl;
+    } catch (e) { alert("Erreur reseau."); }
+}
 </script>
 </body>
 </html>
