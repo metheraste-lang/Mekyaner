@@ -10,103 +10,45 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
 
     <style>
-        :root { --primary: #0288d1; --dark: #1a1a1a; --gray: #757575; --white: #ffffff; }
-        body { font-family: 'Poppins', sans-serif; margin: 0; background: #f0f2f5; color: var(--dark); padding-bottom: 50px; }
+        :root { --primary: #0288d1; --dark: #1a1a1a; --bg: #f0f2f5; }
+        body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); color: var(--dark); padding-bottom: 50px; }
         
-        /* HEADER PROFESSIONNEL */
         header { 
-            background: var(--primary); 
-            color: white; 
-            padding: 25px 15px; 
-            text-align: center; 
-            position: sticky; 
-            top: 0; 
-            z-index: 1000; 
+            background: var(--primary); color: white; padding: 25px 15px; 
+            text-align: center; position: sticky; top: 0; z-index: 1000; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
         }
         .logo-container img {
-            width: 300px;
-            height: 85px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid white;
-            background: white;
-            margin-bottom: 8px;
+            width: 300px; height: 85px; border-radius: 50%; object-fit: cover;
+            border: 3px solid white; background: white; margin-bottom: 8px;
         }
         .brand-name { font-size: 24px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin: 0; }
         .slogan { font-size: 12px; opacity: 0.9; font-style: italic; }
 
-        /* GRILLE DE PRODUITS */
         .container { 
-            max-width: 1100px; 
-            margin: auto; 
-            padding: 15px; 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); 
-            gap: 15px; 
+            max-width: 1100px; margin: auto; padding: 15px; 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; 
         }
-        @media (max-width: 480px) { .container { grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; } }
+        @media (max-width: 480px) { .container { grid-template-columns: 1fr 1fr; gap: 10px; } }
 
-        .product-card { 
-            background: white; 
-            border-radius: 12px; 
-            overflow: hidden; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06); 
-            display: flex;
-            flex-direction: column;
-        }
+        .product-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; flex-direction: column; }
         .product-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; background: #eee; }
+        .product-info { padding: 12px; text-align: center; flex-grow: 1; }
         
-        .product-info { padding: 12px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
-        
-        /* FIX POUR LE NOM DE L'ARTICLE */
         .product-name { 
-            font-size: 14px; 
-            font-weight: 600; 
-            color: var(--dark); 
-            margin-bottom: 8px;
-            line-height: 1.3;
-            min-height: 36px; /* Assure l'alignement */
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            font-size: 14px; font-weight: 600; color: var(--dark); margin-bottom: 8px;
+            min-height: 38px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
         .product-price { color: var(--primary); font-weight: 800; font-size: 17px; margin-bottom: 12px; }
         
-        .btn-buy { 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            width: 100%; 
-            padding: 10px; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-size: 14px;
-        }
+        .btn-buy { background: var(--primary); color: white; border: none; width: 100%; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; }
 
-        /* FENÊTRE DE COMMANDE (MODAL) */
         #orderModal { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0,0,0,0.8); 
-            z-index: 2000; 
-            align-items: center; 
-            justify-content: center; 
-            backdrop-filter: blur(4px); 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
+            z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(4px); 
         }
         .modal-content { background: white; padding: 25px; border-radius: 20px; width: 85%; max-width: 380px; text-align: center; }
-        .modal-content input { 
-            width: 100%; 
-            padding: 12px; 
-            margin: 8px 0; 
-            border: 1px solid #ddd; 
-            border-radius: 10px; 
-            font-size: 15px; 
-            box-sizing: border-box;
-        }
+        .modal-content input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; box-sizing: border-box; }
     </style>
 </head>
 <body>
@@ -119,25 +61,21 @@
     <div class="slogan">Votre plate-forme de vente en ligne au Tchad</div>
 </header>
 
-<div class="container" id="productGrid">
-    </div>
+<div class="container" id="productGrid"></div>
 
 <div id="orderModal">
     <div class="modal-content">
         <h3 id="modalTitle" style="margin-top:0; color:var(--primary);">Article</h3>
         <p id="modalPrice" style="font-size:18px; font-weight:bold; margin-bottom:15px;"></p>
-        
         <input type="text" id="custName" placeholder="Ton Nom Complet">
         <input type="tel" id="custPhone" placeholder="Ton Numéro WhatsApp">
         <input type="text" id="custCity" placeholder="Ta Ville (ex: N'Djamena)">
-        
         <button class="btn-buy" onclick="confirmOrder()" style="margin-top:10px; padding:15px;">🚀 Valider la commande</button>
         <button onclick="closeModal()" style="background:none; border:none; color:gray; margin-top:15px; cursor:pointer;">Annuler</button>
     </div>
 </div>
 
 <script>
-// TA CONFIGURATION FIREBASE
 const firebaseConfig = {
     apiKey: "AIzaSyD5s2cQ68QqoG7vbPGW0lo_M0htpBF12FM",
     authDomain: "mekyaner-ad755.firebaseapp.com",
@@ -149,24 +87,29 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+// COMPTEUR DE VISITES (Nouveauté)
+const updateVisits = async () => {
+    const ref = db.collection("stats").doc("visitors");
+    await ref.set({ count: firebase.firestore.FieldValue.increment(1) }, { merge: true });
+};
+updateVisits();
+
 let selectedProduct = null;
 
-// CHARGEMENT DES PRODUITS
 db.collection("products").orderBy("createdAt", "desc").onSnapshot(snap => {
     const grid = document.getElementById('productGrid');
     grid.innerHTML = '';
     snap.forEach(doc => {
         const p = doc.data();
-        const nomSafe = p.name ? p.name : "Article";
-        const prixSafe = p.price ? Number(p.price).toLocaleString() : "0";
-
+        const nom = p.name || "Article";
         grid.innerHTML += `
         <div class="product-card">
-            <img src="${p.img}" class="product-img" alt="${nomSafe}" onerror="this.src='https://via.placeholder.com/300?text=Mekyaner'">
+            <img src="${p.img}" class="product-img" onerror="this.src='https://via.placeholder.com/300?text=Mekyaner'">
             <div class="product-info">
-                <div class="product-name">${nomSafe}</div>
-                <div class="product-price">${prixSafe} F</div>
-                <button class="btn-buy" onclick="openOrderModal('${nomSafe.replace(/'/g, "\\'")}', ${p.price})">Acheter</button>
+                <div class="product-name">${nom}</div>
+                <div class="product-price">${Number(p.price).toLocaleString()} F</div>
+                <button class="btn-buy" onclick="openOrderModal('${nom.replace(/'/g, "\\'")}', ${p.price})">Acheter</button>
             </div>
         </div>`;
     });
@@ -189,24 +132,16 @@ async function confirmOrder() {
     if(!name || !phone || !city) { alert("Merci de remplir tous les champs !"); return; }
 
     try {
-        // Enregistrement dans l'historique Admin
         await db.collection("orders").add({
-            customerName: name,
-            customerPhone: phone,
-            customerCity: city,
-            productName: selectedProduct.name,
-            totalPrice: selectedProduct.price,
+            customerName: name, customerPhone: phone, customerCity: city,
+            productName: selectedProduct.name, totalPrice: selectedProduct.price,
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        // ENVOI WHATSAPP (Remplace les X par ton numéro)
-        const monNumero = "23586752575"; 
-        const texte = `Salut MEKYANER ! Je suis ${name} de ${city}. Je souhaite commander : ${selectedProduct.name} (${selectedProduct.price.toLocaleString()} F). Mon numéro : ${phone}`;
-        const waUrl = `https://wa.me/${monNumero}?text=${encodeURIComponent(texte)}`;
-
-        alert("Commande confirmée !");
-        window.location.href = waUrl;
-    } catch (e) { alert("Erreur de connexion."); }
+        const monNumero = "23586752575"; // REMPLACE PAR TON NUMÉRO
+        const texte = `Salut MEKYANER ! Je suis ${name} de ${city}. Je commande : ${selectedProduct.name} (${selectedProduct.price.toLocaleString()} F). Mon numéro : ${phone}`;
+        window.location.href = `https://wa.me/${monNumero}?text=${encodeURIComponent(texte)}`;
+    } catch (e) { alert("Erreur réseau."); }
 }
 </script>
 </body>
