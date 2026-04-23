@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mekyaner | Boutique</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root { --primary: #0288d1; --wa: #25D366; --bg: #f4fbff; }
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: var(--bg); }
+        
+        /* ENTÊTE AVEC LOGO EN HAUT */
+        header { 
+            background: var(--primary); 
+            color: #fff; 
+            padding: 25px 15px; 
+            text-align: center; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+        }
+        .logo-header {
+            max-width: 300px; /* Ajuste la taille ici */
+            height: auto;
+            margin-bottom: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        header strong { font-size: 1.5rem; letter-spacing: 2px; display: block; }
+        header p { margin: 5px 0 0; font-size: 0.85rem; opacity: 0.9; }
+
+        .container { max-width: 1000px; margin: 20px auto; padding: 0 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
+        
+        /* Cartes Produits */
+        .prod-card { background: #fff; border-radius: 12px; overflow: hidden; border: 1px solid #eee; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .prod-card img { width: 100%; height: 200px; object-fit: cover; }
+        .btn-wa { background: var(--wa); color: white; padding: 12px; border: none; border-radius: 8px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 10px; }
+
+        /* Modal */
+        #modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:2000; align-items:center; justify-content:center; }
+        .modal-content { background:white; padding:25px; border-radius:15px; width:90%; max-width:400px; }
+        input { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="https://i.ibb.co/CxcghLq/Background-Eraser-20250525-183236550.png" alt="Logo" class="logo-header" onerror="this.style.display='none'">
+    <strong>MEKYANER</strong>
+    <p>Meilleure plateforme de vente en ligne au Tchad</p>
+</header>
+
+<div class="container">
+    <div id="productsGrid" class="grid"></div>
+</div>
+
+<div id="modal">
+    <div class="modal-content">
+        <h3>Commander l'article</h3>
+        <p id="orderDetail" style="color:var(--primary); font-weight:bold;"></p>
+        <input type="text" id="clientName" placeholder="Votre Nom complet">
+        <input type="text" id="clientCity" placeholder="Votre Ville">
+        <input type="tel" id="clientPhone" placeholder="Votre Téléphone">
+        <button class="btn-wa" onclick="confirmOrder()">Confirmer sur WhatsApp</button>
+        <button onclick="closeModal()" style="background:none; border:none; width:100%; margin-top:10px; color:#666; cursor:pointer;">Annuler</button>
+    </div>
+</div>
+
+<script>
+const firebaseConfig = {
+    apiKey: "AIzaSyD5s2cQ68QqoG7vbPGW0lo_M0htpBF12FM",
+    authDomain: "mekyaner-ad755.firebaseapp.com",
+    projectId: "mekyaner-ad755",
+    storageBucket: "mekyaner-ad755.firebasestorage.app",
+    messagingSenderId: "593398207908",
+    appId: "1:593398207908:web:f69a13a9bc5a6079819d31"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const WHATSAPP_NUMBER = "23586752575"; 
+let selectedItem = null;
+
+function openModal(name, price) {
+    selectedItem = { name, price };
+    document.getElementById('orderDetail').innerText = `${name} - ${price} FCFA`;
+    document.getElementById('modal').style.display = 'flex';
+}
+function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+async function confirmOrder() {
+    const cName = document.getElementById('clientName').value;
+    const cCity = document.getElementById('clientCity').value;
+    const cPhone = document.getElementById('clientPhone').value;
+    if(!cName || !cCity || !cPhone) return alert("Remplissez tout !");
+    
+    await db.collection("orders").add({ 
+        product: selectedItem.name, 
+        amount: selectedItem.price, 
+        client: cName, 
+        city: cCity,
+        phone: cPhone, 
+        date: firebase.firestore.FieldValue.serverTimestamp() 
+    });
+
+    const text = `*COMMANDE MEKYANER*%0A📦 *Article :* ${selectedItem.name}%0A💰 *Prix :* ${selectedItem.price} FCFA%0A👤 *Client :* ${cName}%0A📍 *Ville :* ${cCity}%0A📞 *Tel :* ${cPhone}`;
+    window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${text}`, '_blank');
+    closeModal();
+}
+
+db.collection("products").orderBy("createdAt", "desc").onSnapshot(snap => {
+    const grid = document.getElementById('productsGrid');
+    grid.innerHTML = '';
+    snap.forEach(doc => {
+        const p = doc.data();
+        grid.innerHTML += `
+            <div class="prod-card">
+                <img src="${p.img}" onerror="this.src='https://via.placeholder.com/300x200'">
+                <div style="padding:15px">
+                    <strong>${p.name}</strong><br>
+                    <span style="color:var(--primary); font-weight:bold">${p.price.toLocaleString()} FCFA</span>
+                    <button class="btn-wa" onclick="openModal('${p.name.replace(/'/g, "\\'")}', ${p.price})">Commander</button>
+                </div>
+            </div>`;
+    });
+});
+</script>
+</body>
+</html>
