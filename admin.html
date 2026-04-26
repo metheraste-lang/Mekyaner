@@ -11,87 +11,100 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
     <style>
-        :root { --primary: #0288d1; --dark: #263238; --bg: #f0f2f5; --success: #2e7d32; --danger: #d32f2f; }
+        :root { --primary: #0288d1; --dark: #1e293b; --bg: #f8fafc; --success: #10b981; --danger: #ef4444; }
         body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); color: var(--dark); }
         
+        /* LOGIN */
         #loginOverlay { position: fixed; inset: 0; background: var(--dark); display: flex; align-items: center; justify-content: center; z-index: 3000; }
-        .login-box { background: white; padding: 40px; border-radius: 20px; width: 90%; max-width: 350px; text-align: center; }
+        .login-box { background: white; padding: 40px; border-radius: 24px; width: 90%; max-width: 380px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
 
-        header { background: var(--primary); color: white; padding: 20px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .logo-admin { width: 300px; height: 70px; border-radius: 50%; border: 2px solid white; background: white; margin-bottom: 10px; object-fit: cover; }
-        
-        .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; display: grid; grid-template-columns: 1fr; gap: 20px; }
-        @media (min-width: 900px) { .container { grid-template-columns: 1fr 2fr; } }
+        /* HEADER */
+        header { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.1); sticky; top: 0; z-index: 100; }
+        .admin-profile { display: flex; align-items: center; gap: 12px; }
+        .admin-avatar { width: 45px; height: 45px; border-radius: 12px; object-fit: cover; border: 2px solid var(--primary); }
 
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; grid-column: 1 / -1; }
-        .stat-card { background: white; padding: 20px; border-radius: 15px; text-align: center; border-bottom: 4px solid var(--primary); }
-        .stat-val { font-size: 24px; font-weight: bold; color: var(--primary); }
+        /* LAYOUT */
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 1.5fr; gap: 25px; }
+        @media (max-width: 900px) { .container { grid-template-columns: 1fr; } }
 
-        .card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        h3 { margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        /* STATS */
+        .stats-row { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .stat-card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border-left: 5px solid var(--primary); }
+        .stat-card h4 { margin: 0; color: #64748b; font-size: 14px; text-transform: uppercase; }
+        .stat-val { font-size: 28px; font-weight: 800; color: var(--dark); margin: 5px 0; }
 
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn { border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
-        .btn-add { background: var(--primary); color: white; }
-        .btn-danger { background: var(--danger); color: white; width: auto; font-size: 11px; padding: 5px 10px; }
-        
-        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #eee; }
-        .badge-city { background: #e3f2fd; color: var(--primary); padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
+        /* CARDS */
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        h3 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; font-size: 18px; }
+
+        input { width: 100%; padding: 12px 15px; margin: 10px 0; border: 1.5px solid #e2e8f0; border-radius: 12px; outline: none; transition: 0.2s; }
+        input:focus { border-color: var(--primary); }
+
+        .btn { border: none; padding: 14px; border-radius: 12px; cursor: pointer; font-weight: 600; width: 100%; transition: 0.3s; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-outline-danger { background: #fee2e2; color: var(--danger); width: auto; padding: 8px 15px; font-size: 12px; }
+
+        /* LISTS */
+        .scroll-list { max-height: 500px; overflow-y: auto; padding-right: 10px; }
+        .item-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f8fafc; border-radius: 15px; margin-bottom: 12px; }
+        .city-tag { background: #dcfce7; color: #166534; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div id="loginOverlay">
     <div class="login-box">
-        <h2 style="color:var(--primary); margin-bottom:5px;">MEKYANER</h2>
-        <p>Administration</p>
-        <input type="email" id="email" placeholder="Email">
+        <h2 style="color:var(--primary); margin-bottom:10px;">MEKYANER</h2>
+        <p style="color:#64748b; margin-bottom:30px;">Espace Administrateur</p>
+        <input type="email" id="email" placeholder="Email professionnel">
         <input type="password" id="pass" placeholder="Mot de passe">
-        <button class="btn btn-add" onclick="handleLogin()">Se connecter</button>
+        <button class="btn btn-primary" onclick="handleLogin()" style="margin-top:20px;">Accéder au Dashboard</button>
     </div>
 </div>
 
 <header>
-    <img src="https://i.ibb.co/CxcghLq/Background-Eraser-20250525-183236550.png" alt="Logo" class="logo-admin">
-    <div style="font-weight: 800; letter-spacing: 1px;">DASHBOARD ADMIN</div>
-    <button onclick="firebase.auth().signOut()" style="background:none; border:1px solid white; color:white; margin-top:10px; cursor:pointer; padding:2px 10px; border-radius:5px; font-size:11px;">Déconnexion</button>
+    <div class="admin-profile">
+        <img src="https://i.ibb.co/CxcghLq/Background-Eraser-20250525-183236550.png" class="admin-avatar" alt="Admin">
+        <b style="font-size:18px; letter-spacing:1px;">MEKYANER ADMIN</b>
+    </div>
+    <button onclick="firebase.auth().signOut()" style="background:none; border:none; color:var(--danger); font-weight:600; cursor:pointer;">Quitter</button>
 </header>
 
 <div class="container">
-    <div class="stats-grid">
+    <div class="stats-row">
         <div class="stat-card">
+            <h4>Visiteurs</h4>
             <div class="stat-val" id="statVisits">0</div>
-            <small>Visiteurs</small>
         </div>
         <div class="stat-card">
+            <h4>Commandes</h4>
             <div class="stat-val" id="statOrders">0</div>
-            <small>Ventes</small>
         </div>
-        <div class="stat-card" style="grid-column: 1 / -1;">
+        <div class="stat-card" style="border-left-color: var(--success);">
+            <h4>Chiffre d'Affaires</h4>
             <div class="stat-val" id="statRev" style="color:var(--success)">0 F</div>
-            <small>Chiffre d'Affaires Total</small>
         </div>
     </div>
 
     <div class="card">
-        <h3>➕ Nouvel Article</h3>
-        <input id="pName" type="text" placeholder="Nom de l'article">
-        <input id="pPrice" type="number" placeholder="Prix (F)">
-        <input id="pImg" type="text" placeholder="Lien direct ImgBB">
-        <button class="btn btn-add" onclick="addProduct()">Publier</button>
+        <h3>➕ Ajouter un Article</h3>
+        <input id="pName" type="text" placeholder="Nom du produit">
+        <input id="pPrice" type="number" placeholder="Prix (FCFA)">
+        <input id="pImg" type="text" placeholder="Lien image ImgBB">
+        <button class="btn btn-primary" onclick="addProduct()">Publier sur la boutique</button>
     </div>
 
     <div class="card">
         <h3>
-            📋 Historique
-            <button class="btn btn-danger" onclick="clearAllOrders()">Vider tout</button>
+            📋 Historique des Ventes
+            <button class="btn-outline-danger" onclick="clearAllOrders()">Tout vider</button>
         </h3>
-        <div id="orderList">Chargement...</div>
+        <div id="orderList" class="scroll-list">Chargement...</div>
     </div>
 
     <div class="card" style="grid-column: 1 / -1;">
-        <h3>📦 Articles en ligne</h3>
-        <div id="adminList"></div>
+        <h3>📦 Gestion du Stock</h3>
+        <div id="adminList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px;"></div>
     </div>
 </div>
 
@@ -120,21 +133,19 @@ async function handleLogin() {
     try { await auth.signInWithEmailAndPassword(e, p); } catch(err) { alert("Accès refusé"); } 
 }
 
-// STATS VISITEURS
 function loadStats() {
     db.collection("stats").doc("visitors").onSnapshot(doc => {
-        if(doc.exists) document.getElementById('statVisits').innerText = doc.data().count || 0;
+        if(doc.exists) document.getElementById('statVisits').innerText = (doc.data().count || 0).toLocaleString();
     });
 }
 
-// GESTION PRODUITS
 async function addProduct() {
     const name = document.getElementById('pName').value;
     const price = parseInt(document.getElementById('pPrice').value);
     const img = document.getElementById('pImg').value;
     if(name && price && img) {
         await db.collection("products").add({ name, price, img, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-        alert("Article ajouté !");
+        alert("Produit en ligne !");
         document.getElementById('pName').value = ''; document.getElementById('pPrice').value = ''; document.getElementById('pImg').value = '';
     }
 }
@@ -145,20 +156,20 @@ function loadProducts() {
         list.innerHTML = '';
         snap.forEach(doc => {
             const p = doc.data();
-            list.innerHTML += `<div class="item-row">
-                <div style="display:flex; align-items:center; gap:10px;">
-                    <img src="${p.img}" style="width:40px; height:40px; border-radius:5px; object-fit:cover;">
-                    <div><b>${p.name}</b><br><small>${p.price.toLocaleString()} F</small></div>
+            list.innerHTML += `
+            <div class="item-row">
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <img src="${p.img}" style="width:50px; height:50px; border-radius:10px; object-fit:cover;">
+                    <div><b style="font-size:14px;">${p.name}</b><br><small>${p.price.toLocaleString()} F</small></div>
                 </div>
-                <button onclick="deleteProduct('${doc.id}')" style="background:none; border:none; color:red; cursor:pointer;">Supprimer</button>
+                <button onclick="deleteProduct('${doc.id}')" style="background:none; border:none; color:var(--danger); cursor:pointer; font-weight:bold;">Supprimer</button>
             </div>`;
         });
     });
 }
 
-async function deleteProduct(id) { if(confirm("Supprimer cet article ?")) await db.collection("products").doc(id).delete(); }
+async function deleteProduct(id) { if(confirm("Supprimer ce produit définitivement ?")) await db.collection("products").doc(id).delete(); }
 
-// GESTION COMMANDES
 function loadOrders() {
     db.collection("orders").orderBy("timestamp", "desc").onSnapshot(snap => {
         const list = document.getElementById('orderList');
@@ -167,15 +178,21 @@ function loadOrders() {
         snap.forEach(doc => {
             const o = doc.data();
             total += o.totalPrice || 0; count++;
-            list.innerHTML += `<div class="item-row" style="background:#f9f9f9; padding:10px; margin-bottom:8px; border-radius:8px;">
-                <div style="flex:1">
-                    <span class="badge-city">${o.customerCity || 'N/A'}</span><br>
-                    <b style="color:var(--primary)">${o.productName}</b><br>
-                    <small>${o.customerName} - ${o.customerPhone}</small>
+            list.innerHTML += `
+            <div class="item-row" style="flex-direction:column; align-items:flex-start; gap:10px;">
+                <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+                    <span class="city-tag">${o.customerCity || 'Tchad'}</span>
+                    <small style="color:#64748b;">${o.timestamp ? new Date(o.timestamp.toDate()).toLocaleDateString() : ''}</small>
                 </div>
-                <div style="text-align:right">
-                    <b>${(o.totalPrice || 0).toLocaleString()} F</b><br>
-                    <button onclick="deleteOrder('${doc.id}')" style="background:none; border:none; color:red; font-size:10px; cursor:pointer;">Supprimer</button>
+                <div style="width:100%; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <b style="color:var(--primary); font-size:15px;">${o.productName}</b><br>
+                        <span style="font-size:13px;">Client : ${o.customerName}</span>
+                    </div>
+                    <b style="font-size:16px;">${(o.totalPrice || 0).toLocaleString()} F</b>
+                </div>
+                <div style="width:100%; text-align:right; border-top:1px solid #eee; padding-top:8px;">
+                    <button onclick="deleteOrder('${doc.id}')" style="background:none; border:none; color:var(--danger); font-size:11px; cursor:pointer;">❌ Effacer</button>
                 </div>
             </div>`;
         });
@@ -184,14 +201,15 @@ function loadOrders() {
     });
 }
 
-async function deleteOrder(id) { if(confirm("Supprimer cette commande ?")) await db.collection("orders").doc(id).delete(); }
+async function deleteOrder(id) { if(confirm("Supprimer cette vente ?")) await db.collection("orders").doc(id).delete(); }
 
 async function clearAllOrders() {
-    if(confirm("EFFACER TOUT L'HISTORIQUE ?")) {
+    if(confirm("⚠ ATTENTION : Vider tout l'historique ?")) {
         const snap = await db.collection("orders").get();
         const batch = db.batch();
         snap.forEach(doc => batch.delete(doc.ref));
         await batch.commit();
+        alert("Historique réinitialisé.");
     }
 }
 </script>
