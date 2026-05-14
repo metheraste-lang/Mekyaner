@@ -155,6 +155,21 @@ async function processPayment() {
         });
 
         // URL Moneyfusion
+        const axios = require("axios") ;
+
+const apiUrl = "https://pay.moneyfusion.net/Mekyaner/fc67c2db463ae21c/pay/" ; // Obtenez ceci depuis votre tableau de bord
+const makePayment = async (paymentData) => {
+  try {
+    const response = await axios.post(apiUrl, paymentData, {
+      headers : {
+        "Content-Type" : "application/json",
+      },
+    }) ;
+    return response.data ;
+  } catch (error) {
+    lancer l'erreur ;
+  }
+};
         const moneyFusionLink = "https://pay.moneyfusion.net/Mekyaner/fc67c2db463ae21c/pay/";
         
         // Redirection DIRECTE pour éviter les blocages mobiles
