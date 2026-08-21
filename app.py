@@ -12,7 +12,8 @@ from werkzeug.utils import secure_filename
 from db import get_db, init_db
 
 app = Flask(__name__)
-app.secret_key = "change-cette-cle-avant-la-mise-en-ligne"  # à remplacer par une vraie clé secrète en production
+app.secret_key = "mky7382xR9fLpQzT4vNcW1eB6hJk0aDs"
+init_db()
 
 UPLOAD_FOLDER = os.path.join(app.static_folder, "uploads")
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
