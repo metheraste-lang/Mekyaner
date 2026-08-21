@@ -1,17 +1,18 @@
+import sqlite3
 import os
-import psycopg2
-import psycopg2.extras
+
+DB_PATH = os.path.join(os.path.dirname(__file__), "mekyaner.db")
 
 
 def get_db():
-    conn = psycopg2.connect(os.environ["DATABASE_URL"], cursor_factory=psycopg2.extras.RealDictCursor)
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
     return conn
 
 
 def init_db():
     conn = get_db()
-    cur = conn.cursor()
-    cur.execute("""
+    conn.execute("""
         CREATE TABLE IF NOT EXISTS products (
             id TEXT PRIMARY KEY,
             name TEXT NOT NULL,
@@ -25,7 +26,7 @@ def init_db():
             created_at TEXT
         )
     """)
-    cur.execute("""
+    conn.execute("""
         CREATE TABLE IF NOT EXISTS orders (
             id TEXT PRIMARY KEY,
             cart_ref TEXT,
@@ -46,8 +47,7 @@ def init_db():
     """)
     conn.commit()
 
-    cur.execute("SELECT COUNT(*) AS c FROM products")
-    count = cur.fetchone()["c"]
+    count = conn.execute("SELECT COUNT(*) AS c FROM products").fetchone()["c"]
     if count == 0:
         seed = [
             ("p1", "Accessoire auto premium", "physique", 129900, "Accessoire pratique et durable pour votre véhicule.", "🚗", None, None),
@@ -63,8 +63,8 @@ def init_db():
             ("p11", "Créer son entreprise en ligne", "formation", 25000, "De l'idée au lancement, étape par étape.", "💼", None, "https://exemple.com/formation/entreprise"),
             ("p12", "Marketing digital — les bases", "formation", 20000, "Les fondamentaux pour promouvoir une activité en ligne.", "📈", None, "https://exemple.com/formation/marketing"),
         ]
-        cur.executemany(
-            "INSERT INTO products (id, name, type, price, description, icon, image, digital_content) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)",
+        conn.executemany(
+            "INSERT INTO products (id, name, type, price, description, icon, image, digital_content) VALUES (?,?,?,?,?,?,?,?)",
             seed
         )
         conn.commit()
