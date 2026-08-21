@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Mekyaner — Tech. Digital. Formation.{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Tout ce qu'il te faut, <span class="grad">au même endroit</span>.</h1>
+  <p>Produits physiques de toutes catégories, ressources digitales prêtes à l'emploi, et formations pour aller plus loin.</p>
+  <div class="hero-ctas">
+    <a href="{{ url_for('catalogue') }}" class="btn-primary">Explorer la boutique</a>
+    <a href="{{ url_for('formations') }}" class="btn-secondary">Voir les formations</a>
+  </div>
+</section>
+
+<section class="modules">
+  <div class="page-head" style="padding-top:0;">
+    <p style="text-transform:uppercase;letter-spacing:1.5px;color:var(--blue);font-size:0.8rem;font-weight:600;">Trois façons d'avancer</p>
+    <h2 style="margin-top:8px;">Un seul endroit, trois circuits</h2>
+  </div>
+  <div class="modules-grid">
+    <div class="module-card">
+      <div class="node">📦</div>
+      <h3>Produits physiques</h3>
+      <p>Électronique, auto, maison, mode et bien plus — livrés chez toi.</p>
+    </div>
+    <div class="module-card">
+      <div class="node">💾</div>
+      <h3>Produits digitaux</h3>
+      <p>Templates, schémas, ressources en téléchargement immédiat.</p>
+    </div>
+    <div class="module-card">
+      <div class="node">🎓</div>
+      <h3>Formations</h3>
+      <p>Cours en ligne, du premier pas aux projets avancés.</p>
+    </div>
+  </div>
+</section>
+
+<div class="container" style="max-width:400px;text-align:center;padding-top:0;">
+  <h3 style="font-size:1rem;margin-bottom:14px;">Suivre ma commande</h3>
+  <a href="{{ url_for('suivi') }}" class="btn-secondary" style="display:inline-block;">Vérifier l'état d'une commande</a>
+</div>
+{% endblock %}

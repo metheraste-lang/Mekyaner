@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Mekyaner — Formations{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Nos formations</h1>
+  <p>Des cours pratiques, accessibles dès validation de ton paiement, pour progresser à ton rythme.</p>
+</div>
+
+<div class="wrap" style="max-width:1000px;padding-bottom:100px;">
+  {% if products|length == 0 %}
+    <div class="empty-state">Aucune formation disponible pour le moment.</div>
+  {% else %}
+    {% for f in products %}
+    <div class="formation-card">
+      <div class="formation-visual">
+        {% if f.image %}<img src="{{ url_for('static', filename=f.image) }}" alt="{{ f.name }}">{% else %}{{ f.icon }}{% endif %}
+      </div>
+      <div>
+        <h3 style="font-size:1.1rem;margin-bottom:6px;">{{ f.name }}</h3>
+        <p style="color:var(--text-dim);font-size:0.88rem;margin-bottom:10px;">{{ f.description }}</p>
+        <div style="color:var(--orange);font-weight:700;font-size:1rem;">{{ f.price|fcfa }}</div>
+      </div>
+      <a href="{{ url_for('produit', product_id=f.id) }}" class="formation-cta">Voir la formation</a>
+    </div>
+    {% endfor %}
+  {% endif %}
+</div>
+{% endblock %}

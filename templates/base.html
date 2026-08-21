@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Mekyaner{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="{{ url_for('accueil') }}"><img src="{{ url_for('static', filename='logo.jpg') }}" alt="Mekyaner" class="logo-img"></a>
+    <div class="nav-links">
+      <a href="{{ url_for('accueil') }}" class="{{ 'active' if active_page == 'accueil' }}">Accueil</a>
+      <a href="{{ url_for('catalogue') }}" class="{{ 'active' if active_page == 'catalogue' }}">Catalogue</a>
+      <a href="{{ url_for('formations') }}" class="{{ 'active' if active_page == 'formations' }}">Formations</a>
+      <a href="{{ url_for('apropos') }}" class="{{ 'active' if active_page == 'apropos' }}">À propos</a>
+      <a href="{{ url_for('contact') }}" class="{{ 'active' if active_page == 'contact' }}">Contact</a>
+    </div>
+    <a href="{{ url_for('panier') }}" class="cart-btn">🛒 Panier ({{ cart_count or 0 }})</a>
+  </nav>
+</header>
+
+{% block content %}{% endblock %}
+
+<footer>© 2026 Mekyaner — Tech, digital &amp; formation.</footer>
+
+</body>
+</html>

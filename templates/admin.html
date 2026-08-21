@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Mekyaner — Admin{% endblock %}
+{% block content %}
+<div class="container" style="max-width:1100px;">
+  <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+    <a href="{{ url_for('admin_logout') }}" style="background:rgba(244,246,255,0.08);padding:8px 16px;border-radius:100px;font-size:0.82rem;">Se déconnecter</a>
+  </div>
+
+  <div class="tabs">
+    <div class="tab-btn active" data-tab="produits" onclick="showTab('produits')">📦 Produits</div>
+    <div class="tab-btn" data-tab="commandes" onclick="showTab('commandes')">🧾 Commandes {% if pending > 0 %}<span class="badge">{{ pending }}</span>{% endif %}</div>
+    <div class="tab-btn" data-tab="stats" onclick="showTab('stats')">📊 Statistiques</div>
+  </div>
+
+  <div class="tab-panel active" id="tab-produits">
+    <div class="section-title">
+      <h2 style="font-size:1.1rem;">Produits ({{ products|length }})</h2>
+      <button class="add-btn" onclick="document.getElementById('addForm').classList.toggle('show')">+ Ajouter un produit</button>
+    </div>
+    <form class="add-form" id="addForm" method="post" action="{{ url_for('admin_produit_ajouter') }}" enctype="multipart/form-data">
+      <div class="row">
+        <input type="text" name="name" placeholder="Nom du produit" required>
+        <input type="number" name="price" placeholder="Prix (FCFA)" required>
+      </div>
+      <div class="row">
+        <select name="type">
+          <option value="physique">Produit physique</option>
+          <option value="digital">Produit digital</option>
+          <option value="formation">Formation</option>
+        </select>
+        <input type="text" name="icon" placeholder="Icône (emoji)" value="🛍️">
+      </div>
+      <textarea name="description" rows="2" placeholder="Description" style="margin-bottom:10px;"></textarea>
+      <input type="text" name="digital_content" placeholder="Lien de téléchargement / accès (digital et formations)" style="margin-bottom:10px;">
+      <label style="display:block;font-size:0.82rem;color:var(--text-dim);margin-bottom:6px;">Image du produit (optionnelle)</label>
+      <input type="file" name="image" accept="image/*" style="margin-bottom:10px;">
+      <button type="submit" class="save-btn">Ajouter le produit</button>
+    </form>
+
+    {% for p in products %}
+    <div class="product-row">
+      {% if p.image %}<img src="{{ url_for('static', filename=p.image) }}" class="p-thumb-img">{% else %}<div class="p-icon">{{ p.icon }}</div>{% endif %}
+      <div class="p-info">
+        <div class="p-name">{{ p.name }}</div>
+        <div class="p-meta">{{ category_labels[p.type] }} · {{ p.price|fcfa }}</div>
+      </div>
+      <div class="p-clicks">👁 {{ p.clicks }} clics</div>
+      <button class="share-btn" onclick="copyLink('{{ p.id }}', this)">🔗 Copier le lien</button>
+      <form action="{{ url_for('admin_produit_supprimer', product_id=p.id) }}" method="post" onsubmit="return confirm('Supprimer ce produit ?');">
+        <button type="submit" class="del-btn">🗑</button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="tab-panel" id="tab-commandes">
+    <h2 style="font-size:1.1rem;margin-bottom:18px;">Historique des commandes ({{ orders|length }})</h2>
+    {% if orders|length == 0 %}
+      <p style="color:var(--text-dim);font-size:0.9rem;">Aucune commande pour le moment.</p>
+    {% endif %}
+    {% set labels = {'en_attente':'En attente','valide':'Validé','a_livrer':'À livrer','livre':'Livré'} %}
+    {% for o in orders %}
+    <div class="order-card">
+      <div class="order-top">
+        <div>
+          <div class="o-name">{{ o.product_name }}</div>
+          <div class="o-meta">{{ o.customer_firstname }} {{ o.customer_name }} · {{ o.phone }} · {{ o.quartier }}</div>
+        </div>
+        <div class="o-id">{{ o.id }}</div>
+      </div>
+      {% if o.type != 'physique' %}
+        <div class="order-proof">Paiement : {{ o.payment_method }} — Preuve : "{{ o.proof }}"</div>
+      {% endif %}
+      <div class="order-bottom">
+        <span class="status-badge status-{{ o.status }}">{{ labels[o.status] }}</span>
+        {% if o.status == 'en_attente' %}
+          <form action="{{ url_for('admin_commande_valider', order_id=o.id) }}" method="post"><button class="validate-btn">Valider le paiement</button></form>
+        {% elif o.status == 'a_livrer' %}
+          <form action="{{ url_for('admin_commande_livrer', order_id=o.id) }}" method="post"><button class="validate-btn">Marquer comme livré</button></form>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="tab-panel" id="tab-stats">
+    <h2 style="font-size:1.1rem;margin-bottom:18px;">Statistiques</h2>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="val">{{ total_clicks }}</div><div class="lbl">Clics totaux</div></div>
+      <div class="stat-card"><div class="val">{{ orders|length }}</div><div class="lbl">Commandes</div></div>
+      <div class="stat-card"><div class="val">{{ pending }}</div><div class="lbl">En attente de validation</div></div>
+    </div>
+    <h3 style="font-size:0.95rem;margin-bottom:12px;">Clics par produit</h3>
+    {% for p in products %}
+    <div style="background:var(--bg-panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;margin-bottom:8px;font-size:0.88rem;">
+      <span>{{ p.icon }} {{ p.name }}</span>
+      <span style="color:var(--text-dim);font-size:0.78rem;">{{ p.clicks }} clics</span>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script>
+function showTab(name){
+  document.querySelectorAll('.tab-panel').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  document.querySelector('[data-tab="' + name + '"]').classList.add('active');
+}
+function copyLink(productId, btn){
+  const link = window.location.origin + "/produit/" + productId;
+  navigator.clipboard.writeText(link).then(() => {
+    const original = btn.textContent;
+    btn.textContent = "✔ Copié !";
+    setTimeout(() => btn.textContent = original, 1500);
+  }).catch(() => prompt("Copie ce lien :", link));
+}
+</script>
+{% endblock %}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Mekyaner — Catalogue{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Le catalogue Mekyaner</h1>
+  <p>Produits physiques, ressources digitales et formations — tout au même endroit.</p>
+</div>
+
+<div class="filters">
+  <a href="{{ url_for('catalogue') }}" class="filter-btn {{ 'active' if filter_type == 'all' }}">Tout voir</a>
+  <a href="{{ url_for('catalogue', type='physique') }}" class="filter-btn {{ 'active' if filter_type == 'physique' }}">Produits physiques</a>
+  <a href="{{ url_for('catalogue', type='digital') }}" class="filter-btn {{ 'active' if filter_type == 'digital' }}">Produits digitaux</a>
+  <a href="{{ url_for('catalogue', type='formation') }}" class="filter-btn {{ 'active' if filter_type == 'formation' }}">Formations</a>
+</div>
+
+<div class="catalogue">
+  {% set visible = products|selectattr('type', 'equalto', filter_type)|list if filter_type != 'all' else products %}
+  {% if visible|length == 0 %}
+    <div class="empty-state">Aucun produit dans cette catégorie pour le moment.</div>
+  {% else %}
+  <div class="product-grid">
+    {% for p in visible %}
+    <div class="product-card">
+      <div class="product-thumb">
+        {% if p.image %}<img src="{{ url_for('static', filename=p.image) }}" alt="{{ p.name }}">{% else %}{{ p.icon }}{% endif %}
+      </div>
+      <div class="product-info">
+        <div class="cat">{{ category_labels[p.type] }}</div>
+        <h4>{{ p.name }}</h4>
+        <div class="price">{{ p.price|fcfa }}</div>
+        <div class="card-actions">
+          <a href="{{ url_for('produit', product_id=p.id) }}" class="view-btn">Voir le produit</a>
+          <form action="{{ url_for('panier_ajouter', product_id=p.id) }}" method="post">
+            <button type="submit" class="add-cart-btn">+ 🛒</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Mekyaner — Suivre ma commande{% endblock %}
+{% block content %}
+<div class="container" style="max-width:500px;">
+  <h1 style="font-size:1.4rem;margin-bottom:20px;">Suivre ma commande</h1>
+  <form method="post" style="display:flex;gap:10px;margin-bottom:24px;">
+    <input type="tel" name="phone" placeholder="Ton numéro de téléphone" required>
+    <button type="submit" class="save-btn" style="white-space:nowrap;">Rechercher</button>
+  </form>
+
+  {% if orders is not none %}
+    {% if orders|length == 0 and request.method == 'POST' %}
+      <p style="color:var(--text-dim);font-size:0.9rem;">Aucune commande trouvée pour ce numéro.</p>
+    {% endif %}
+    {% for o in orders %}
+    <div class="order-card">
+      <div class="order-top">
+        <div><div class="o-name">{{ o.product_name }}</div></div>
+        <div class="o-id">{{ o.id }}</div>
+      </div>
+      {% set labels = {'en_attente':'En attente de validation','valide':'Validé — téléchargement disponible','a_livrer':'À livrer (paiement à la livraison)','livre':'Livré'} %}
+      <span class="status-badge status-{{ o.status }}">{{ labels[o.status] }}</span>
+      {% if o.status == 'valide' and o.digital_content %}
+        <a href="{{ o.digital_content }}" target="_blank" class="validate-btn" style="display:inline-block;margin-left:10px;">⬇ Télécharger mon produit</a>
+      {% endif %}
+    </div>
+    {% endfor %}
+  {% endif %}
+</div>
+{% endblock %}

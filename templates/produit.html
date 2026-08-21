@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Mekyaner{% if product %} — {{ product.name }}{% endif %}{% endblock %}
+{% block content %}
+<div class="container" style="max-width:920px;">
+  <a href="{{ url_for('catalogue') }}" class="back-link">← Retour au catalogue</a>
+
+  {% if not product %}
+    <div style="text-align:center;padding:60px 20px;color:var(--text-dim);">
+      <h2 style="color:var(--text);margin-bottom:10px;">Produit introuvable</h2>
+      <p>Ce lien ne correspond à aucun produit disponible.</p>
+    </div>
+
+  {% elif confirmation %}
+    <div class="confirmation">
+      <div class="check">✔</div>
+      <h3>Commande enregistrée</h3>
+      <p>Référence : <span class="ref">{{ confirmation.id }}</span></p>
+      {% if product.type == 'physique' %}
+        <p style="color:var(--text-dim);font-size:0.9rem;">Le paiement se fera à la livraison. Tu seras contacté(e) au {{ confirmation.phone }}.</p>
+      {% else %}
+        <p style="color:var(--text-dim);font-size:0.9rem;">Ta preuve de paiement a été envoyée. Ton produit sera disponible dès validation par l'administration — vérifie via "Suivre ma commande".</p>
+      {% endif %}
+    </div>
+
+  {% else %}
+    <div class="product-top">
+      <div class="product-visual">
+        {% if product.image %}<img src="{{ url_for('static', filename=product.image) }}" alt="{{ product.name }}">{% else %}{{ product.icon }}{% endif %}
+      </div>
+      <div class="product-main">
+        <span class="cat-tag">{{ category_labels[product.type] }}</span>
+        <h1>{{ product.name }}</h1>
+        <div class="price">{{ product.price|fcfa }}</div>
+        <p class="desc">{{ product.description }}</p>
+      </div>
+    </div>
+
+    <div class="order-panel">
+      <h3 style="margin-bottom:18px;">Passer commande</h3>
+      <form method="post">
+        <div class="field-row">
+          <input type="text" name="nom" placeholder="Nom" required>
+          <input type="text" name="prenom" placeholder="Prénom" required>
+        </div>
+        <div class="full-field"><input type="tel" name="phone" placeholder="Numéro de téléphone" required></div>
+        <div class="full-field"><input type="text" name="quartier" placeholder="Quartier" required></div>
+
+        {% if product.type == 'physique' %}
+          <div class="delivery-note">🚚 Paiement à la livraison — tu régleras à réception du produit.</div>
+          <button type="submit" class="submit-btn">Confirmer la commande</button>
+        {% else %}
+          <div class="payment-section">
+            <h4 style="font-size:0.92rem;margin-bottom:10px;">Moyen de paiement</h4>
+            <div class="payment-methods">
+              {% for m in payment_methods %}
+              <label class="pm-label" style="{{ 'opacity:0.4;cursor:not-allowed;' if not m.active }}">
+                <input type="radio" name="payment_method" value="{{ m.id }}" {{ 'checked' if loop.first }} {{ 'disabled' if not m.active }}>
+                <strong>{{ m.label }}</strong><br>
+                <span class="pm-number">{{ m.number }}</span>
+              </label>
+              {% endfor %}
+            </div>
+            <p class="payment-hint">Envoie le montant au numéro sélectionné, puis colle ci-dessous l'ID ou le message de confirmation reçu.</p>
+            <textarea name="proof" rows="3" placeholder="ID de transaction ou message de paiement reçu" required></textarea>
+          </div>
+          <button type="submit" class="submit-btn">Envoyer ma preuve de paiement</button>
+        {% endif %}
+      </form>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

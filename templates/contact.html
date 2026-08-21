@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Mekyaner — Contact & FAQ{% endblock %}
+{% block content %}
+<div class="container" style="max-width:760px;">
+  <h1 style="text-align:center;margin-bottom:10px;">Contact & questions fréquentes</h1>
+  <p style="color:var(--text-dim);text-align:center;margin-bottom:44px;">Une question sur ta commande ? Voici de quoi t'aider rapidement.</p>
+
+  <div class="contact-row">
+    <div class="contact-card"><div style="font-size:1.5rem;margin-bottom:8px;">📞</div><div style="color:var(--text-dim);font-size:0.78rem;text-transform:uppercase;">Téléphone</div><div style="font-weight:600;">À compléter</div></div>
+    <div class="contact-card"><div style="font-size:1.5rem;margin-bottom:8px;">📧</div><div style="color:var(--text-dim);font-size:0.78rem;text-transform:uppercase;">Email</div><div style="font-weight:600;">À compléter</div></div>
+    <div class="contact-card"><div style="font-size:1.5rem;margin-bottom:8px;">📍</div><div style="color:var(--text-dim);font-size:0.78rem;text-transform:uppercase;">Facebook</div><div style="font-weight:600;">À compléter</div></div>
+  </div>
+
+  <h2 style="font-size:1.3rem;margin-bottom:20px;">Questions fréquentes</h2>
+
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span>Comment se passe le paiement pour un produit physique ?</span><span>+</span></div>
+    <div class="faq-a"><p>Tu payes uniquement à la livraison, en espèces, directement au livreur. Aucun paiement en ligne n'est requis pour ces produits.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span>Comment payer un produit digital ou une formation ?</span><span>+</span></div>
+    <div class="faq-a"><p>Tu envoies le montant via Airtel Money ou Moov Money au numéro indiqué sur la fiche produit, puis tu colles l'ID ou le message de confirmation reçu dans le formulaire de commande.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span>Quand puis-je télécharger mon produit digital ?</span><span>+</span></div>
+    <div class="faq-a"><p>Dès que l'équipe Mekyaner a vérifié ta preuve de paiement. Tu peux suivre l'état de ta commande depuis la page d'accueil, avec ton numéro de téléphone.</p></div>
+  </div>
+  <div class="faq-item">
+    <div class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span>Quel est le délai de livraison pour un produit physique ?</span><span>+</span></div>
+    <div class="faq-a"><p>Le délai varie selon ta localisation. Une fois ta commande enregistrée, tu seras contacté(e) directement pour convenir d'un créneau de livraison.</p></div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Mekyaner — Panier{% endblock %}
+{% block content %}
+<div class="container">
+  <h1 style="font-size:1.7rem;margin-bottom:24px;">Mon panier</h1>
+
+  {% if confirmation %}
+    <div class="confirmation">
+      <div class="check">✔</div>
+      <h3>Commande envoyée</h3>
+      <p style="color:var(--text-dim);font-size:0.9rem;">Merci ! Tu peux suivre l'état de ta commande depuis la page d'accueil avec ton numéro de téléphone.</p>
+    </div>
+
+  {% elif not cart %}
+    <div style="text-align:center;color:var(--text-dim);padding:60px 20px;">
+      Ton panier est vide. <a href="{{ url_for('catalogue') }}" style="color:var(--blue);font-weight:600;">Voir le catalogue</a>
+    </div>
+
+  {% else %}
+    {% for item in cart %}
+    <div class="cart-item">
+      <div class="thumb">
+        {% if item.image %}<img src="{{ url_for('static', filename=item.image) }}">{% else %}{{ item.icon }}{% endif %}
+      </div>
+      <div class="info">
+        <div class="name">{{ item.name }}</div>
+        <div class="meta">{{ 'Produit physique' if item.type == 'physique' else ('Produit digital' if item.type == 'digital' else 'Formation') }}</div>
+      </div>
+      <div class="qty-controls">
+        <form action="{{ url_for('panier_maj', product_id=item.id, action='dec') }}" method="post"><button class="qty-btn">−</button></form>
+        <span class="qty-val">{{ item.qty }}</span>
+        <form action="{{ url_for('panier_maj', product_id=item.id, action='inc') }}" method="post"><button class="qty-btn">+</button></form>
+      </div>
+      <div class="item-price">{{ (item.price * item.qty)|fcfa }}</div>
+      <form action="{{ url_for('panier_maj', product_id=item.id, action='remove') }}" method="post"><button class="remove-btn">🗑</button></form>
+    </div>
+    {% endfor %}
+
+    <div class="summary">
+      {% if has_physique %}<div class="summary-row"><span>Sous-total produits physiques (paiement à la livraison)</span><span>{{ physique_total|fcfa }}</span></div>{% endif %}
+      {% if has_digital %}<div class="summary-row"><span>Sous-total digital / formations (mobile money)</span><span>{{ digital_total|fcfa }}</span></div>{% endif %}
+      <div class="summary-row total"><span>Total</span><span>{{ total|fcfa }}</span></div>
+    </div>
+
+    <div style="margin-top:24px;">
+      <h3 style="font-size:1.05rem;margin-bottom:16px;">Finaliser la commande</h3>
+      <form method="post" action="{{ url_for('panier_commander') }}">
+        <div class="field-row">
+          <input type="text" name="nom" placeholder="Nom" required>
+          <input type="text" name="prenom" placeholder="Prénom" required>
+        </div>
+        <div class="full-field"><input type="tel" name="phone" placeholder="Numéro de téléphone" required></div>
+        <div class="full-field"><input type="text" name="quartier" placeholder="Quartier" required></div>
+
+        {% if has_physique %}
+        <div class="delivery-note">🚚 Les produits physiques de ta commande seront payés à la livraison.</div>
+        {% endif %}
+
+        {% if has_digital %}
+        <div class="payment-section">
+          <h4 style="font-size:0.92rem;margin-bottom:10px;">Paiement des produits digitaux / formations</h4>
+          <div class="payment-methods">
+            {% for m in payment_methods %}
+            <label class="pm-label" style="{{ 'opacity:0.4;cursor:not-allowed;' if not m.active }}">
+              <input type="radio" name="payment_method" value="{{ m.id }}" {{ 'checked' if loop.first }} {{ 'disabled' if not m.active }}>
+              <strong>{{ m.label }}</strong><br>
+              <span class="pm-number">{{ m.number }}</span>
+            </label>
+            {% endfor %}
+          </div>
+          <p class="payment-hint">Envoie le sous-total digital/formation au numéro choisi, puis colle la preuve ci-dessous.</p>
+          <textarea name="proof" rows="3" placeholder="ID de transaction ou message de paiement reçu" required></textarea>
+        </div>
+        {% endif %}
+
+        <button type="submit" class="submit-btn">Valider ma commande</button>
+      </form>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

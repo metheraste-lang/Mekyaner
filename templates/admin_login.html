@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Mekyaner — Admin{% endblock %}
+{% block content %}
+<div class="login-box">
+  <div class="lock">🔒</div>
+  <h2>Espace administrateur</h2>
+  <p>Accès réservé à l'équipe Mekyaner</p>
+  {% if error %}<p class="login-error">Mot de passe incorrect.</p>{% endif %}
+  <form method="post">
+    <input type="password" name="password" placeholder="Mot de passe" required>
+    <button type="submit">Se connecter</button>
+  </form>
+</div>
+{% endblock %}
